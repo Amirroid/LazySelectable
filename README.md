@@ -1,5 +1,5 @@
 # Drag to select items in lazy Compose [![](https://jitpack.io/v/Amirroid/LazySelectable.svg)](https://jitpack.io/#Amirroid/LazySelectable)
-if you want use drag to select items in `LazyColumn`, `LazyRow`, `LazyVerticalGrid`, `LazyHorizontalGrid`, `LazyVerticalStaggeredGrid`, `LazyHorizontalStaggeredGrid`, you should use this library
+if you want to use drag to select items in `LazyColumn`, `LazyRow`, `LazyVerticalGrid`, `LazyHorizontalGrid`, `LazyVerticalStaggeredGrid`, `LazyHorizontalStaggeredGrid`, you should use this library
 
 ## How to use?
 **Step 1**. Add the JitPack repository to your build file
