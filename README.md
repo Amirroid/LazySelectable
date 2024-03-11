@@ -32,7 +32,7 @@ val lazyGridSelectableState = rememberLazyGridSelectableState(lazyGridState = la
 LazyVerticalGrid(
 	state = lazyGridState,
 	// For detect inputs
-	modifier = <pre>Modifier<b>.verticalSelectableHandler(lazyGridSelectableState)</b></pre>,
+	modifier = Modifier`**.verticalSelectableHandler(lazyGridSelectableState)**`,
 	columns = GridCells.Fixed(3),
 	horizontalArrangement = Arrangement.spacedBy(12.dp),
 	contentPadding = PaddingValues(12.dp),
