@@ -18,3 +18,35 @@ dependencies {
 	implementation("com.github.Amirroid:LazySelectable:${latest_version}")
 }
 ```
+**Step 3**. Write states
+```kotlin
+// For Lazy Grids
+val lazyGridState = rememberLazyGridState()
+
+// For understand states
+val lazyGridSelectableState = rememberLazyGridSelectableState(lazyGridState = lazyGridState)
+```
+
+**Step 4**. Use Lazy Components
+``` kotlin
+LazyVerticalGrid(
+	state = lazyGridState,
+	// For detect inputs
+	modifier = Modifier.verticalSelectableHandler(lazyGridSelectableState),
+	columns = GridCells.Fixed(3),
+	horizontalArrangement = Arrangement.spacedBy(12.dp),
+	contentPadding = PaddingValues(12.dp),
+	verticalArrangement = Arrangement.spacedBy(12.dp)
+){
+	items(100) { index ->
+		val selected =
+		lazyGridSelectableState.selected.any { info -> info.index == index }
+		val color = if (selected) Color.Red else Color.Blue
+		Box(
+			modifier = Modifier
+				.background(color)
+				.fillMaxWidth()
+				.aspectRatio(1f)
+	)
+}
+```
