@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 group = "ir.amirroid"
-version = "1.0.4"
+version = "1.0.5"
 
 android {
     namespace = "ir.amirroid.lazyselectable"
@@ -57,7 +57,7 @@ publishing {
                 from(components["release"])
                 groupId = "ir.amirroid"
                 artifactId = "LazySelectable"
-                version = "1.0.4"
+                version = "1.0.5"
             }
         }
     }
