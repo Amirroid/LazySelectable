@@ -53,14 +53,15 @@ fun Modifier.selectableHandler(
             }
         }
     }
-    val lazyListState = state.lazyGridState
+    val lazyGridState = state.lazyGridState
     var fromItemInfo: LazyGridItemInfo? = null
     var lastItemInfo: LazyGridItemInfo? = null
     pointerInput(Unit) {
+        val showedItems = mutableSetOf<LazyGridItemInfo>()
         val thresholdsScrollPx = thresholdsScroll.toPx()
         detectDragGesturesAfterLongPress(
             onDragStart = {
-                val info = lazyListState.getItemInfoByOffset(it)
+                val info = lazyGridState.getItemInfoByOffset(it)
                 if (info != fromItemInfo) {
                     state.dragIsProgress = true
                     fromItemInfo = info
@@ -80,7 +81,8 @@ fun Modifier.selectableHandler(
             onDrag = { change, _ ->
                 state.dragIsProgress = true
                 if (fromItemInfo != null) {
-                    lazyListState.getItemInfoByOffset(change.position)?.let { itemInfo ->
+                    lazyGridState.getItemInfoByOffset(change.position)?.let { itemInfo ->
+                        showedItems.apply { addAll(lazyGridState.layoutInfo.visibleItemsInfo) }
                         val lastIndex = lastItemInfo?.index ?: fromItemInfo!!.index
                         val toIndex = itemInfo.index
                         val fromIndex = fromItemInfo!!.index
@@ -90,10 +92,10 @@ fun Modifier.selectableHandler(
                         val removeReverseRangedFilter = state.selected.filter {
                             it.index in lastIndex..fromIndex
                         }.toSet()
-                        val rangedFilter = lazyListState.layoutInfo.visibleItemsInfo.filter {
+                        val rangedFilter = showedItems.filter {
                             it.index in fromIndex..toIndex
                         }.toItemInfo()
-                        val reverseRangedFilter = lazyListState.layoutInfo.visibleItemsInfo.filter {
+                        val reverseRangedFilter = showedItems.filter {
                             it.index in toIndex..fromIndex
                         }.toItemInfo()
                         state.selected = state.selected.minus(

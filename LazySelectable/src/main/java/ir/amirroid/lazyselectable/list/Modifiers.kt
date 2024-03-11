@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListItemInfo
+import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -55,6 +56,7 @@ fun Modifier.selectableHandler(
     var fromItemInfo: LazyListItemInfo? = null
     var lastItemInfo: LazyListItemInfo? = null
     pointerInput(Unit) {
+        val showedItems = mutableSetOf<LazyListItemInfo>()
         val thresholdsScrollPx = thresholdsScroll.toPx()
         detectDragGesturesAfterLongPress(
             onDragStart = {
@@ -79,6 +81,7 @@ fun Modifier.selectableHandler(
                 state.dragIsProgress = true
                 if (fromItemInfo != null) {
                     lazyListState.getItemInfoByOffset(change.position, isRow)?.let { itemInfo ->
+                        showedItems.apply { addAll(lazyListState.layoutInfo.visibleItemsInfo) }
                         val lastIndex = lastItemInfo?.index ?: fromItemInfo!!.index
                         val toIndex = itemInfo.index
                         val fromIndex = fromItemInfo!!.index
@@ -88,10 +91,10 @@ fun Modifier.selectableHandler(
                         val removeReverseRangedFilter = state.selected.filter {
                             it.index in lastIndex..fromIndex
                         }.toSet()
-                        val rangedFilter = lazyListState.layoutInfo.visibleItemsInfo.filter {
+                        val rangedFilter = showedItems.filter {
                             it.index in fromIndex..toIndex
                         }.toItemInfo(isRow)
-                        val reverseRangedFilter = lazyListState.layoutInfo.visibleItemsInfo.filter {
+                        val reverseRangedFilter = showedItems.filter {
                             it.index in toIndex..fromIndex
                         }.toItemInfo(isRow)
                         state.selected = state.selected.minus(

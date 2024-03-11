@@ -5,7 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -31,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import ir.amirroid.lazyselectable.grid.horizontalSelectableHandler
 import ir.amirroid.lazyselectable.grid.rememberLazyGridSelectableState
 import ir.amirroid.lazyselectable.grid.selectableHandler
+import ir.amirroid.lazyselectable.grid.verticalSelectableHandler
 import ir.amirroid.lazyselectable.list.horizontalSelectableHandler
 import ir.amirroid.lazyselectable.list.rememberLazyListSelectableState
 import ir.amirroid.lazyselectable.list.selectableHandler
@@ -48,27 +53,28 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val listState = rememberLazyStaggeredGridState()
-                    val state = rememberLazyGridStaggeredSelectableState(listState)
-                    LazyVerticalStaggeredGrid(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalSelectableHandler(state),
-                        columns = StaggeredGridCells.Fixed(3)
+                    val lazyGridState = rememberLazyGridState()
+                    val lazyGridSelectableState =
+                        rememberLazyGridSelectableState(lazyGridState = lazyGridState)
+
+                    LazyVerticalGrid(
+                        state = lazyGridState,
+                        modifier = Modifier.verticalSelectableHandler(lazyGridSelectableState),
+                        columns = GridCells.Fixed(3),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(20) {
-                            val plusHeight = it * 3
-                            Box(modifier = Modifier
-                                .padding(12.dp)
-                                .height(200.dp + 1.dp * plusHeight)
-                                .width(120.dp)
-                                .background(
-                                    if (state.selected.any { d -> d.index == it }) Color.Red else Color.Blue
-                                )
-                                .clickable {
-                                    state.selectByIndex(it)
-                                })
+                        items(100) { index ->
+                            val selected =
+                                lazyGridSelectableState.selected.any { info -> info.index == index }
+                            val color = if (selected) Color.Red else Color.Blue
+                            Box(
+                                modifier = Modifier
+                                    .background(color)
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f)
+                            )
                         }
                     }
                 }

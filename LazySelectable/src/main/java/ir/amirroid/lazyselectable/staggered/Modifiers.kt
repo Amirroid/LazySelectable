@@ -3,6 +3,7 @@ package ir.amirroid.lazyselectable.staggered
 import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,13 +51,14 @@ fun Modifier.selectableHandler(
             }
         }
     }
-    val lazyListState = state.lazyStaggeredState
+    val lazyStaggeredGridState = state.lazyStaggeredState
     var fromItemInfo: LazyStaggeredGridItemInfo? = null
     var lastItemInfo: LazyStaggeredGridItemInfo? = null
     pointerInput(Unit) {
+        val showedItems = mutableSetOf<LazyStaggeredGridItemInfo>()
         val thresholdsScrollPx = thresholdsScroll.toPx()
         detectDragGesturesAfterLongPress(onDragStart = {
-            val info = lazyListState.getItemInfoByOffset(it)
+            val info = lazyStaggeredGridState.getItemInfoByOffset(it)
             if (info != fromItemInfo) {
                 state.dragIsProgress = true
                 fromItemInfo = info
@@ -73,7 +75,8 @@ fun Modifier.selectableHandler(
         }, onDrag = { change, _ ->
             state.dragIsProgress = true
             if (fromItemInfo != null) {
-                lazyListState.getItemInfoByOffset(change.position)?.let { itemInfo ->
+                lazyStaggeredGridState.getItemInfoByOffset(change.position)?.let { itemInfo ->
+                    showedItems.apply { addAll(lazyStaggeredGridState.layoutInfo.visibleItemsInfo) }
                     val lastIndex = lastItemInfo?.index ?: fromItemInfo!!.index
                     val toIndex = itemInfo.index
                     val fromIndex = fromItemInfo!!.index
@@ -83,10 +86,10 @@ fun Modifier.selectableHandler(
                     val removeReverseRangedFilter = state.selected.filter {
                         it.index in lastIndex..fromIndex
                     }.toSet()
-                    val rangedFilter = lazyListState.layoutInfo.visibleItemsInfo.filter {
+                    val rangedFilter = showedItems.filter {
                         it.index in fromIndex..toIndex
                     }.staggeredToItemInfo()
-                    val reverseRangedFilter = lazyListState.layoutInfo.visibleItemsInfo.filter {
+                    val reverseRangedFilter = showedItems.filter {
                         it.index in toIndex..fromIndex
                     }.staggeredToItemInfo()
                     state.selected = state.selected.minus(
